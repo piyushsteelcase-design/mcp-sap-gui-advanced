@@ -2,6 +2,29 @@
 
 A Model Context Protocol (MCP) server providing comprehensive SAP GUI automation capabilities for Claude Desktop integration. Features 22 professional SAP automation tools implemented in both Python and TypeScript.
 
+## 🚀 Quick Start
+
+### Option 1: Automated Setup (Recommended)
+```bash
+# Clone the repository
+git clone https://github.com/USERNAME/mcp-sap-gui-advanced.git
+cd mcp-sap-gui-advanced
+
+# Run the quick setup script
+# Windows:
+quick-setup.bat
+
+# macOS/Linux:
+chmod +x quick-setup.sh
+./quick-setup.sh
+```
+
+### Option 2: Manual Setup
+See [SETUP.md](SETUP.md) for detailed manual installation instructions.
+
+## 🔒 Privacy & Security
+This project operates entirely locally and does not collect or transmit personal information. See [PRIVACY.md](PRIVACY.md) for complete details.
+
 ## Project Structure
 
 ```

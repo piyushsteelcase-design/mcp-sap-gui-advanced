@@ -7,6 +7,14 @@
 - **Node.js 18.0+** (for TypeScript implementation)
 - **VS Code** or **Claude Desktop** (for MCP integration)
 
+## Step 1: Clone and Setup Project
+
+```bash
+# Clone the repository
+git clone https://github.com/USERNAME/mcp-sap-gui-advanced.git
+cd mcp-sap-gui-advanced
+```
+
 ## Option 1: Python Implementation (Recommended)
 
 ### 1. Setup Python Environment
@@ -21,11 +29,40 @@ python test_comprehensive.py
 
 ### 2. Configure Claude Desktop
 ```bash
+# Copy the configuration template
 # Windows
 copy claude_desktop_direct.json "%APPDATA%\Claude\claude_desktop_config.json"
 
 # macOS/Linux  
 cp claude_desktop_direct.json ~/.config/claude/claude_desktop_config.json
+```
+
+**IMPORTANT**: Edit the copied configuration file and replace `REPLACE_WITH_FULL_PATH_TO_PROJECT` with your actual project path:
+
+**Windows Example:**
+```json
+{
+  "mcpServers": {
+    "sap-automation": {
+      "command": "python",
+      "args": ["C:/Users/USERNAME/mcp-sap-gui-advanced/python/direct_sap_server.py"],
+      "cwd": "C:/Users/USERNAME/mcp-sap-gui-advanced/python"
+    }
+  }
+}
+```
+
+**macOS/Linux Example:**
+```json
+{
+  "mcpServers": {
+    "sap-automation": {
+      "command": "python",
+      "args": ["/home/username/mcp-sap-gui-advanced/python/direct_sap_server.py"],
+      "cwd": "/home/username/mcp-sap-gui-advanced/python"
+    }
+  }
+}
 ```
 
 ## Option 2: TypeScript Implementation
@@ -51,11 +88,40 @@ node test-comprehensive.js
 
 ### 3. Configure Claude Desktop
 ```bash
+# Copy the configuration template
 # Windows
 copy claude-desktop-config.json "%APPDATA%\Claude\claude_desktop_config.json"
 
 # macOS/Linux
 cp claude-desktop-config.json ~/.config/claude/claude_desktop_config.json
+```
+
+**IMPORTANT**: Edit the copied configuration file and replace `REPLACE_WITH_FULL_PATH_TO_PROJECT` with your actual project path:
+
+**Windows Example:**
+```json
+{
+  "mcpServers": {
+    "sap-automation-typescript": {
+      "command": "node",
+      "args": ["C:/Users/USERNAME/mcp-sap-gui-advanced/typescript/direct-sap-server.js"],
+      "cwd": "C:/Users/USERNAME/mcp-sap-gui-advanced/typescript"
+    }
+  }
+}
+```
+
+**macOS/Linux Example:**
+```json
+{
+  "mcpServers": {
+    "sap-automation-typescript": {
+      "command": "node",
+      "args": ["/home/username/mcp-sap-gui-advanced/typescript/direct-sap-server.js"],
+      "cwd": "/home/username/mcp-sap-gui-advanced/typescript"
+    }
+  }
+}
 ```
 
 ## Verification

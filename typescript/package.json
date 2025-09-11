@@ -10,7 +10,7 @@
     "clean": "rimraf *.js *.d.ts *.js.map"
   },
   "keywords": ["mcp", "sap", "automation", "claude-desktop"],
-  "author": "Your Name",
+  "author": "MCP Community",
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^20.0.0",

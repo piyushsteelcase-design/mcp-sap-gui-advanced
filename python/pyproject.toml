@@ -7,7 +7,7 @@ name = "sap-mcp-server"
 version = "1.0.0"
 description = "SAP GUI automation MCP server"
 authors = [
-    {name = "SAP Automation Team", email = "team@example.com"}
+    {name = "MCP Community", email = "info@example.com"}
 ]
 readme = "README.md"
 license = {file = "LICENSE"}

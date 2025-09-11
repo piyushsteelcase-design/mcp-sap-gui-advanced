@@ -2,8 +2,8 @@
   "mcpServers": {
     "sap-automation-typescript": {
       "command": "node",
-      "args": ["./direct-sap-server.js"],
-      "cwd": "./typescript"
+      "args": ["REPLACE_WITH_FULL_PATH_TO_PROJECT/typescript/direct-sap-server.js"],
+      "cwd": "REPLACE_WITH_FULL_PATH_TO_PROJECT/typescript"
     }
   }
 }

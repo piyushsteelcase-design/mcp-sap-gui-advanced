@@ -135,6 +135,12 @@ logs
 # claude_desktop_direct.json and claude-desktop-config.json contain relative paths
 # Users should update these with their actual installation paths
 
+# Keep setup scripts
+!quick-setup.sh
+!quick-setup.bat
+!setup.sh
+!setup.bat
+
 # IDE files
 .idea/
 *.swp
