@@ -1,0 +1,20 @@
+# SAP MCP Server - Python Requirements
+# No external dependencies - uses only Python standard library
+
+# Python version requirement: >= 3.7
+# The direct_sap_server.py is designed to work with minimal dependencies
+# for maximum compatibility and easy deployment
+
+# Optional development tools (uncomment if needed):
+# pytest>=7.0.0           # For advanced testing
+# black>=22.0.0           # For code formatting  
+# mypy>=0.991             # For type checking
+# flake8>=5.0.0           # For linting
+
+# Note: The server uses only these standard library modules:
+# - json (JSON processing)
+# - sys (system interface)
+# - asyncio (async I/O, Python 3.7+)
+# - logging (logging support)
+# - datetime (date/time handling)
+# - os (operating system interface)

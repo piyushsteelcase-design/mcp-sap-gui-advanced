@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "sap-automation": {
+      "command": "python",
+      "args": ["./direct_sap_server.py"],
+      "cwd": "./python"
+    }
+  }
+}

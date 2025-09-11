@@ -1,0 +1,23 @@
+{
+  "name": "sap-mcp-server-typescript",
+  "version": "1.0.0",
+  "description": "SAP MCP Server - TypeScript Direct Implementation",
+  "main": "direct-sap-server.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node direct-sap-server.js",
+    "test": "node test-direct.js",
+    "clean": "rimraf *.js *.d.ts *.js.map"
+  },
+  "keywords": ["mcp", "sap", "automation", "claude-desktop"],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "rimraf": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

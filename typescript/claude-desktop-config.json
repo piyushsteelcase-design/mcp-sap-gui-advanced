@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "sap-automation-typescript": {
+      "command": "node",
+      "args": ["./direct-sap-server.js"],
+      "cwd": "./typescript"
+    }
+  }
+}
