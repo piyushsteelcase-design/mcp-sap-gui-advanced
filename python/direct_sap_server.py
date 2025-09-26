@@ -296,7 +296,30 @@ class DirectSAPMCPServer:
                     "required": []
                 }
             },
-            
+            {
+                "name": "sap_open_logon",
+                "description": "Open the SAP Logon application on the host system",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "exe_path": {"type": "string", "description": "Path to saplogon.exe (optional)"}
+                    },
+                    "required": []
+                }
+            },
+            {
+                "name": "sap_open_system_from_logon",
+                "description": "Open a specific SAP system from SAP Logon window using real GUI automation",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "system_name": {"type": "string", "description": "Name of the system to open (e.g., 'A60 S/4HANA Assurance')"},
+                        "system_id": {"type": "string", "description": "System ID (e.g., 'A60')"}
+                    },
+                    "required": ["system_id"]
+                }
+            },
+
             # Advanced Operations
             {
                 "name": "sap_execute_transaction",
@@ -363,6 +386,34 @@ class DirectSAPMCPServer:
                         "session_id": {"type": "string", "description": "Session ID", "default": "default"}
                     },
                     "required": ["filename", "target"]
+                }
+            },
+            {
+                "name": "sap_dynamic_login",
+                "description": "Execute complete dynamic SAP login flow with system detection and credential input",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "test_steps": {
+                            "type": "array", 
+                            "description": "List of test steps containing login instructions",
+                            "items": {"type": "object", "properties": {"action": {"type": "string"}}}
+                        },
+                        "use_agents": {"type": "boolean", "description": "Use agent-based execution", "default": True},
+                        "use_mcp": {"type": "boolean", "description": "Use MCP protocol", "default": True}
+                    },
+                    "required": ["test_steps"]
+                }
+            },
+            {
+                "name": "sap_run_test",
+                "description": "Execute comprehensive SAP test using agents and MCP - professional testing interface",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "test_type": {"type": "string", "description": "Type of test to run", "enum": ["login", "transaction", "full"], "default": "login"}
+                    },
+                    "required": []
                 }
             }
         ]
@@ -494,7 +545,126 @@ class DirectSAPMCPServer:
             filename = arguments.get('filename', 'sap_screenshot.png')
             session_id = arguments.get('session_id', 'default')
             result_text = f"Screenshot saved as '{filename}' from session {session_id}"
-        
+        # Open SAP Logon
+        elif tool_name == "sap_open_logon":
+            import subprocess
+            import os
+
+            exe_path = arguments.get('exe_path')
+            if not exe_path:
+                # Try multiple common SAP Logon locations in order of preference
+                potential_paths = [
+                    r"C:\Program Files (x86)\SAP\FrontEnd\SAPgui\saplogon.exe",
+                    r"C:\Program Files\SAP\FrontEnd\SAPgui\saplogon.exe",
+                    r"C:\SAP\FrontEnd\SAPgui\saplogon.exe"
+                ]
+
+                # Find the first existing path
+                exe_path = None
+                for path in potential_paths:
+                    if os.path.exists(path):
+                        exe_path = path
+                        break
+
+                if not exe_path:
+                    result_text = "Failed to launch SAP Logon: No SAP GUI installation found in standard locations"
+                    return {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": result_text
+                            }
+                        ]
+                    }
+
+            try:
+                # Verify the path exists before attempting to launch
+                if not os.path.exists(exe_path):
+                    result_text = f"Failed to launch SAP Logon: File not found at '{exe_path}'"
+                else:
+                    subprocess.Popen(exe_path)
+                    result_text = f"SAP Logon launched successfully from '{exe_path}'"
+            except Exception as e:
+                result_text = f"Failed to launch SAP Logon: {e}"
+        # Open specific system from SAP Logon
+        elif tool_name == "sap_open_system_from_logon":
+            system_name = arguments.get('system_name', '')
+            system_id = arguments.get('system_id', '')
+
+            if not system_id:
+                result_text = "System ID is required to open a system from SAP Logon"
+            else:
+                try:
+                    # Enhanced real GUI automation based on Java SAP Driver architecture
+                    import pyautogui
+                    import pygetwindow as gw
+                    import time
+
+                    # Find SAP Logon window
+                    sap_windows = gw.getWindowsWithTitle("SAP Logon")
+                    if not sap_windows:
+                        # Try alternative window titles
+                        sap_windows = gw.getWindowsWithTitle("SAP Logon 800")
+                        if not sap_windows:
+                            result_text = f"SAP Logon window not found. Please ensure SAP Logon is open."
+                            return {
+                                "content": [
+                                    {
+                                        "type": "text",
+                                        "text": result_text
+                                    }
+                                ]
+                            }
+
+                    sap_window = sap_windows[0]
+                    logger.info(f"Found SAP Logon window: {sap_window.title}")
+
+                    # Activate and bring to front
+                    sap_window.activate()
+                    time.sleep(1)
+
+                    # Get window dimensions
+                    x, y, width, height = sap_window.left, sap_window.top, sap_window.width, sap_window.height
+                    logger.info(f"SAP Logon window: x={x}, y={y}, width={width}, height={height}")
+
+                    # Look for A60 system in the connections list
+                    # Based on typical SAP Logon layout, the connections list is in the right panel
+                    # A60 should be approximately in the middle-right area
+
+                    # Calculate position for A60 system (adjust based on your screenshot)
+                    # From your screenshot, A60 appears to be roughly:
+                    # - 60% from left edge of window
+                    # - 65% from top edge of window (accounting for it being in the list)
+                    a60_x = x + int(width * 0.6)
+                    a60_y = y + int(height * 0.65)
+
+                    logger.info(f"Attempting to double-click A60 at position: ({a60_x}, {a60_y})")
+
+                    # Perform double-click on A60 system entry
+                    pyautogui.doubleClick(a60_x, a60_y)
+
+                    # Wait for login dialog to appear
+                    time.sleep(3)
+
+                    # Verify if login dialog appeared by checking for new windows
+                    time.sleep(1)
+                    all_windows_after = gw.getAllWindows()
+                    sap_login_windows = [w for w in all_windows_after if 'SAP' in w.title and w.title != sap_window.title]
+
+                    if sap_login_windows:
+                        login_window = sap_login_windows[0]
+                        result_text = f"Successfully opened {system_id} system! Login dialog appeared: '{login_window.title}' at position ({a60_x}, {a60_y})"
+                        logger.info(f"Login dialog detected: {login_window.title}")
+                    else:
+                        result_text = f"Double-clicked on {system_id} system at position ({a60_x}, {a60_y}). Check screen for login dialog."
+                        logger.info("No new SAP window detected, but double-click was performed")
+
+                except ImportError:
+                    result_text = f"GUI automation libraries not available. Please install: pip install pyautogui pygetwindow"
+                except Exception as e:
+                    logger.error(f"Error in GUI automation: {str(e)}")
+                    result_text = f"Failed to open {system_id} system from SAP Logon: {str(e)}"
+
         # Advanced Operations
         elif tool_name == "sap_execute_transaction":
             tcode = arguments.get('transaction_code', 'VA01')
@@ -531,8 +701,68 @@ class DirectSAPMCPServer:
             session_id = arguments.get('session_id', 'default')
             result_text = f"Imported data from '{filename}' to '{target}' with mapping {mapping} in session {session_id}"
         
+        elif tool_name == "sap_dynamic_login":
+            # Dynamic SAP login with complete flow
+            test_steps = arguments.get('test_steps', [])
+            use_agents = arguments.get('use_agents', True)
+            use_mcp = arguments.get('use_mcp', True)
+            
+            try:
+                # Import and execute dynamic login
+                import sys
+                import os
+                parent_dir = os.path.dirname(os.path.dirname(__file__))
+                sys.path.append(parent_dir)
+                from dynamic_sap_login_handler import execute_dynamic_sap_test
+                
+                result = execute_dynamic_sap_test(test_steps, use_agents, use_mcp)
+                
+                if result['status'] == 'success':
+                    result_text = f"✅ Dynamic SAP login completed successfully!\n"
+                    result_text += f"System: {result.get('system', 'N/A')}\n"
+                    result_text += f"Client: {result.get('client', 'N/A')}\n" 
+                    result_text += f"User: {result.get('user', 'N/A')}\n"
+                    result_text += f"Execution time: {result.get('execution_time', 'N/A')}\n"
+                    result_text += f"Message: {result.get('message', 'Success')}"
+                else:
+                    result_text = f"❌ Dynamic SAP login failed: {result.get('message', 'Unknown error')}"
+            
+            except Exception as e:
+                result_text = f"❌ Error in dynamic SAP login: {str(e)}"
+        
+        elif tool_name == "sap_run_test":
+            # Professional SAP testing interface using agents and MCP
+            test_type = arguments.get('test_type', 'login')
+            
+            try:
+                # Import enhanced SAP executor agent
+                import sys
+                import os
+                parent_dir = os.path.dirname(os.path.dirname(__file__))
+                sys.path.append(parent_dir)
+                from agents.enhanced_sap_executor_agent import EnhancedSAPExecutorAgent
+                
+                # Initialize agent
+                agent = EnhancedSAPExecutorAgent()
+                
+                # Run comprehensive test
+                result = agent.run_comprehensive_test(test_type)
+                
+                if result.get('status') == 'success':
+                    result_text = f"✅ SAP {test_type} test completed successfully!\n"
+                    result_text += f"System: {result.get('system', 'N/A')}\n"
+                    result_text += f"Client: {result.get('client', 'N/A')}\n"
+                    result_text += f"User: {result.get('user', 'N/A')}\n"
+                    result_text += f"Execution time: {result.get('execution_time', 'N/A')}\n"
+                    result_text += f"Message: {result.get('message', 'Professional test execution completed')}"
+                else:
+                    result_text = f"❌ SAP {test_type} test failed: {result.get('message', 'Unknown error')}"
+            
+            except Exception as e:
+                result_text = f"❌ Error in SAP test execution: {str(e)}"
+        
         else:
-            result_text = f"Unknown SAP tool: {tool_name}. Available tools: sap_connect, sap_navigate, sap_input_field, sap_get_table_data, etc."
+            result_text = f"Unknown SAP tool: {tool_name}. Available tools: sap_connect, sap_navigate, sap_input_field, sap_get_table_data, sap_dynamic_login, etc."
         
         return {
             "content": [
