@@ -5,9 +5,16 @@ Test comprehensive SAP tools in the MCP server
 
 from direct_sap_server import DirectSAPMCPServer
 import json
+import sys
+
+
+def _configure_stdout_utf8() -> None:
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
 
 def test_comprehensive_tools():
     """Test that all comprehensive SAP tools are available"""
+    _configure_stdout_utf8()
     print("Testing comprehensive SAP MCP server...")
     
     server = DirectSAPMCPServer()
@@ -30,7 +37,8 @@ def test_comprehensive_tools():
         "Screen Info": ["sap_get_screen_info", "sap_get_status_message"],
         "Visual": ["sap_screenshot"],
         "Advanced": ["sap_execute_transaction", "sap_wait_for_screen"],
-        "Data Exchange": ["sap_export_data", "sap_import_data"]
+        "Data Exchange": ["sap_export_data", "sap_import_data"],
+        "Agent-based Tests": ["sap_dynamic_login", "sap_run_test"]
     }
     
     available_tools = [tool["name"] for tool in tools]
@@ -87,6 +95,28 @@ def test_comprehensive_tools():
         }
     })
     print(f"✅ Execute Transaction: {exec_result['content'][0]['text']}")
+
+    # Test sap_run_test success path
+    run_test_result = server.handle_tool_call({
+        "name": "sap_run_test",
+        "arguments": {"test_type": "full"}
+    })
+    run_test_text = run_test_result["content"][0]["text"]
+    if "test completed successfully" not in run_test_text:
+        raise AssertionError(f"sap_run_test full failed: {run_test_text}")
+    print(f"✅ sap_run_test (full): {run_test_text.splitlines()[0]}")
+
+    # Test sap_run_test invalid input handling
+    invalid_test_result = server.handle_tool_call({
+        "name": "sap_run_test",
+        "arguments": {"test_type": "invalid"}
+    })
+    invalid_test_text = invalid_test_result["content"][0]["text"]
+    if "Unsupported test_type" not in invalid_test_text:
+        raise AssertionError(
+            f"sap_run_test invalid input handling failed: {invalid_test_text}"
+        )
+    print("✅ sap_run_test invalid input handling: returns explicit error message")
     
     print(f"\n🎉 SUCCESS: All {len(tools)} SAP automation tools are working!")
     return True

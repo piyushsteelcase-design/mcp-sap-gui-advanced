@@ -9,8 +9,15 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 from direct_sap_server import DirectSAPMCPServer
 
+
+def _configure_stdout_utf8() -> None:
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+
+
 def test_direct_server():
     """Test the direct MCP server without subprocess"""
+    _configure_stdout_utf8()
     print("Testing Direct SAP MCP Server (Non-interactive)...")
     
     try:
@@ -53,6 +60,26 @@ def test_direct_server():
         }
         connect_result = server.handle_tool_call(connect_params)
         print(f"✅ Connect tool: Success")
+
+        print("🧪 Testing sap_run_test (login)...")
+        run_test_result = server.handle_tool_call({
+            "name": "sap_run_test",
+            "arguments": {"test_type": "login"}
+        })
+        run_test_text = run_test_result["content"][0]["text"]
+        if "test completed successfully" not in run_test_text:
+            raise AssertionError(f"sap_run_test login failed: {run_test_text}")
+        print("✅ sap_run_test login: Success")
+
+        print("🧪 Testing sap_run_test invalid test_type handling...")
+        invalid_test_result = server.handle_tool_call({
+            "name": "sap_run_test",
+            "arguments": {"test_type": "invalid"}
+        })
+        invalid_test_text = invalid_test_result["content"][0]["text"]
+        if "Unsupported test_type" not in invalid_test_text:
+            raise AssertionError(f"sap_run_test invalid type handling failed: {invalid_test_text}")
+        print("✅ sap_run_test invalid type handling: Success")
         
         print("")
         print("🎉 SUCCESS: Direct MCP server test completed!")
