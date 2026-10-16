@@ -739,7 +739,8 @@ class DirectSAPMCPServer:
                 import sys
                 import os
                 parent_dir = os.path.dirname(os.path.dirname(__file__))
-                sys.path.append(parent_dir)
+                if parent_dir not in sys.path:
+                    sys.path.append(parent_dir)
                 from agents.enhanced_sap_executor_agent import EnhancedSAPExecutorAgent
                 
                 # Initialize agent
@@ -758,7 +759,15 @@ class DirectSAPMCPServer:
                 else:
                     result_text = f"❌ SAP {test_type} test failed: {result.get('message', 'Unknown error')}"
             
+            except ModuleNotFoundError as e:
+                logger.exception("Enhanced SAP test agent module is missing")
+                result_text = (
+                    "❌ SAP test agent module is missing. "
+                    "Expected: agents.enhanced_sap_executor_agent.EnhancedSAPExecutorAgent "
+                    f"(details: {str(e)})"
+                )
             except Exception as e:
+                logger.exception("Error in SAP test execution")
                 result_text = f"❌ Error in SAP test execution: {str(e)}"
         
         else:

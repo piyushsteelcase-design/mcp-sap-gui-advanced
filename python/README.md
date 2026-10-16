@@ -51,6 +51,7 @@ This directory contains the Python implementation of the SAP MCP (Model Context 
 **Advanced Operations:**
 - `sap_execute_transaction` - Execute multi-step transactions
 - `sap_wait_for_screen` - Wait for specific screens to load
+- `sap_run_test` - Run a comprehensive SAP workflow test via the enhanced executor agent
 
 **Data Exchange:**
 - `sap_export_data` - Export SAP data to files (CSV, Excel, etc.)
